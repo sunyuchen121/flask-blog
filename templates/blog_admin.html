@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block link %}
+    <script src={{ url_for('static', filename='ckeditor/ckeditor.js') }}></script>
+
+{% endblock link %}
+
+{% block body1 %}
+    <div class="container mt-4" style="width: 60%">
+        <div class="row">
+            <div class="col-9">
+                <a class="btn btn-primary" href={{ url_for('blog.article_add') }} role="button">创建文章</a>
+            </div>
+        </div>
+
+        {% for _flash in get_flashed_messages() %}
+            <div class="row">
+                <div class="col-9">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+
+                        <strong>
+                            {{ _flash }}
+                        </strong>
+
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        {% for art in articles %}
+            <div class="row mt-2">
+                <div class="col-8">
+                    <ul class="list-group">
+                        <li class="list-group-item">《{{ art.title }}》 authored by: 1746950509@qq.com</li>
+                    </ul>
+                </div>
+                <div class="col-4 mt-1">
+                    <a type="button" class="btn btn-outline-primary mr-1"
+                       href={{ url_for('blog.article_edit', number=art.id) }}>修 改</a>
+                    <button type="button" class="btn btn-outline-danger" data-toggle="modal"
+                            data-target="#find{{ art.category_id }}{{ art.id }}">
+                        删 除
+                    </button>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="find{{ art.category_id }}{{ art.id }}" data-backdrop="static"
+                         data-keyboard="false"
+                         tabindex="-1"
+                         aria-labelledby="find{{ art.category_id }}{{ art.id }}Label" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="find{{ art.category_id }}{{ art.id }}Label">删除确认</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    是否删除文章《{{ art.title }}》
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" data-dismiss="modal">取消</button>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                                                onclick="del_article({{ art.id }})">确认删除
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        {% endfor %}
+        <br><br>
+    </div>
+{% endblock body1 %}
+
+
+{% block scripts %}
+    <script>
+        function del_article(number) {
+            $.ajax({
+                url: '{{ url_for('blog.article_post', _external=True) }}',
+                data: JSON.stringify({"number": number, 'op': 'delete'}),
+                headers: {'X-CSRFToken': '{{csrf_token()}}' },
+                type: 'post',
+                contentType: 'application/json',
+                success: function (res) {
+                    if (res.success === false) {
+                        alert(res.msg);
+                    } else {
+                        location.reload()
+                    }
+                },
+                error: function (xhr, errorMessage, e) {
+                    alert(errorMessage);
+                }
+            });
+            return true
+        }
+    </script>
+{% endblock scripts %}

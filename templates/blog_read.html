@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+
+{% block link %}
+    <script src={{ url_for('static', filename='ckeditor/ckeditor.js') }}></script>
+    {{ ckeditor.load_code_theme() }}
+{% endblock link %}
+{% block style %}
+    body {
+    padding-top: 5rem;
+    }
+    .starter-template {
+    padding: 3rem 1.5rem;
+    text-align: center;
+    }
+{% endblock style %}
+
+{% block body1 %}
+    {% for _flash in get_flashed_messages() %}
+        <div class="container" style="width: 50%">
+            <div class="row">
+                <div class="col">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+
+                        <strong>
+                            {{ _flash }}
+                        </strong>
+
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% endfor %}
+    <div class="container">
+        <div class="starter-template">
+
+            <h1>{{ article.title }}</h1>
+            <p class="lead">{{ article.desc }}</p>
+        </div>
+    </div>
+    <div class="container shadow-lg p-3 mb-5 bg-white rounded">
+        {{ article.body|safe }}
+    </div>
+    <div class="container shadow-lg p-3 mb-5 bg-white rounded">
+        <h5 class="border-bottom border-gray pb-2 mb-0">评论区</h5>
+        {% for comment in comments %}
+            <div class="media pt-3">
+                <svg class="bd-placeholder-img mr-2 rounded" width="64" height="64" xmlns="http://www.w3.org/2000/svg"
+                     role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false">
+                    <rect width="100%" height="100%" fill="#007bff"/>
+                    <text x="50%" y="50%" fill="#007bff" dy=".3em">64x64</text>
+                </svg>
+
+                <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <strong class="text-gray-dark">{{ comment.parent.author.email }}</strong>
+
+                        <button class="btn btn-link btn-block text-right" type="button" data-toggle="modal"
+                                data-target="#Modal{{ comment.parent.id }}" style="width: 65px">
+                            回 复
+                        </button>
+                        <div class="modal fade" id="Modal{{ comment.parent.id }}" tabindex="-1"
+                             aria-labelledby="exampleModalLabel"
+                             aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="reply_form{{ comment.parent.id }}" method="post"
+                                              action={{ url_for('blog.comment_add') }}>
+                                            <div class="form-group">
+                                                {{ reply_form.csrf_token }}
+                                                {{ reply_form.parent_user_email.label }}
+                                                {{ reply_form.parent_user_email(value=comment.parent.author.email) }}
+                                                {{ reply_form.parent_comment_id(value=comment.parent.id,type="hidden") }}
+                                                {{ reply_form.article_id(value=article.id,type="hidden") }}
+                                                {{ reply_form.root_comment_id(value=comment.parent.id,type="hidden") }}
+                                            </div>
+                                            <div class="form-group">
+                                                {{ reply_form.parent_comment.label }}
+                                                <textarea class="form-control" id="parent_comment" maxlength="200"
+                                                          minlength="1" name="parent_comment" readonly="readonly"
+                                                          required="" rows="5">{{ comment.parent.body }}</textarea>
+                                                {#                                                {{ reply_form.parent_comment(value=comment.parent.body) }}#}
+                                            </div>
+                                            <div class="form-group">
+                                                {{ reply_form.body.label }}
+                                                {{ reply_form.body(rows=5) }}
+
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                    关闭
+                                                </button>
+                                                {{ reply_form.submit(class="btn btn-primary",form="reply_form" ~ comment.parent.id) }}
+
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row ml-1 mr-5">
+                        <p class="font-weight-normal">{{ comment.parent.body }}</p>
+                    </div>
+                    <div class="d-flex flex-row-reverse bd-highlight">
+                        <div class="p-2 bd-highlight">{{ comment.parent.create_time }}</div>
+                    </div>
+
+                </div>
+            </div>
+            {% for child in comment.child %}
+                <div class="media  shadow-lg p-3 ml-5 bg-white rounded">
+                    <svg class="bd-placeholder-img mr-4 rounded" width="64" height="64"
+                         xmlns="http://www.w3.org/2000/svg"
+                         role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice"
+                         focusable="false">
+                        <rect width="100%" height="100%" fill="#007bff"/>
+                        <text x="50%" y="50%" fill="#007bff" dy=".3em">64x64</text>
+                    </svg>
+
+                    <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                        <div class="d-flex justify-content-between align-items-center w-100">
+                            <strong class="text-gray-dark">{{ child.author.email }}</strong>
+
+                            <button class="btn btn-link btn-block text-right" type="button" data-toggle="modal"
+                                    data-target="#Modal{{ child.id }}" style="width: 65px">
+                                回 复
+                            </button>
+                            <div class="modal fade" id="Modal{{ child.id }}" tabindex="-1"
+                                 aria-labelledby="exampleModalLabel"
+                                 aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="reply_form{{ child.id }}" method="post"
+                                                  action={{ url_for('blog.comment_add') }}>
+                                                <div class="form-group">
+                                                    {{ reply_form.csrf_token }}
+                                                    {{ reply_form.parent_user_email.label }}
+                                                    {{ reply_form.parent_user_email(value=child.author.email) }}
+                                                    {{ reply_form.parent_comment_id(value=child.id,type="hidden") }}
+                                                    {{ reply_form.article_id(value=article.id,type="hidden") }}
+                                                    {{ reply_form.root_comment_id(value=comment.parent.id,type="hidden") }}
+                                                </div>
+                                                <div class="form-group">
+                                                    {{ reply_form.parent_comment.label }}
+                                                    <textarea class="form-control" id="parent_comment" maxlength="200"
+                                                              minlength="1" name="parent_comment" readonly="readonly"
+                                                              required="" rows="5">{{ child.body }}</textarea>
+                                                    {#                                                    {{ reply_form.parent_comment(value=child.body) }}#}
+                                                    <input type="hidden" value="1">
+                                                </div>
+                                                <div class="form-group">
+                                                    {{ reply_form.body.label }}
+                                                    {{ reply_form.body(rows=5) }}
+
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-dismiss="modal">
+                                                        关闭
+                                                    </button>
+                                                    {{ reply_form.submit(class="btn btn-primary",form="reply_form" ~ child.id) }}
+
+                                                </div>
+                                            </form>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row ml-1 mr-5">
+                            <textarea class="form-control" maxlength="200" minlength="1" readonly="readonly"
+                                      required="">{{ child.body }}</textarea>
+                        </div>
+                        <div class="row ml-1 mr-5">
+                            <p class="font-weight-normal">{{ child.body }}</p>
+                        </div>
+                        <div class="d-flex flex-row-reverse bd-highlight">
+                            <div class="p-2 bd-highlight">{{ child.create_time }}</div>
+                        </div>
+
+                    </div>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+    </div>
+    <div class="container shadow-lg p-3 mb-5 bg-white rounded">
+        <form id="comment_form" method="post" action={{ url_for('blog.comment_add') }}>
+            <div class="form-group">
+                {{ comment_form.csrf_token }}
+                {#                <label for="exampleFormControlTextarea1">评论：</label>#}
+                {#                <textarea class="form-control" id="exampleFormControlTextarea1" name="body" rows="3"></textarea>#}
+                <input name="article_id" id="article_id" type="hidden" value={{ article.id }}>
+                {{ comment_form.body.label }}
+                {{ comment_form.body(rows=5) }}
+            </div>
+            {{ comment_form.submit(class="btn btn-primary") }}
+        </form>
+    </div>
+{% endblock body1 %}

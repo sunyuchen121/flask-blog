@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block body1 %}
+    <div class="container mt-4" style="width: 50%">
+        <div class="row">
+            <div class="col-9">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal"
+                        data-whatever="@mdo">新增 文章分类
+                </button>
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">New Category</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="add_category_form" method="post" action={{ url_for('blog.category_post') }}>
+                                    <div class="form-group">
+                                        {{ form_.csrf_token }}
+                                        {{ form_.name.label }}
+                                        {{ form_.name }}
+                                        {#                                        <label for="recipient-name" class="col-form-label">Recipient:</label>#}
+                                        {#                                        <input type="text" class="form-control" id="recipient-name">#}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form_.user_email.label }}
+                                        {{ form_.user_email }}
+                                        {{ form_.op }}
+                                        {#                                        <label for="message-text" class="col-form-label">Message:</label>#}
+                                        {#                                        <input type="text" class="form-control" id="message-text">#}
+                                    </div>
+                                </form>
+
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                {{ form_.submit }}
+                                {#                                <button type="button" class="btn btn-primary">Send message</button>#}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% for _flash in get_flashed_messages() %}
+            <div class="row">
+                <div class="col-9">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+
+                        <strong>
+                            {{ _flash }}
+                        </strong>
+
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        {% for cty in categories %}
+            <div class="row mt-2">
+                <div class="col-7">
+                    <ul class="list-group">
+                        <li class="list-group-item">{{ cty.category }}</li>
+                    </ul>
+                </div>
+                <div class="col-2">
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-outline-danger mt-1" data-toggle="modal"
+                            data-target="#d{{ cty.category }}{{ cty.id }}a">
+                        删 除
+                    </button>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="d{{ cty.category }}{{ cty.id }}a" data-backdrop="static"
+                         data-keyboard="false"
+                         tabindex="-1"
+                         aria-labelledby="d{{ cty.category }}{{ cty.id }}aLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="d{{ cty.category }}{{ cty.id }}aLabel">删除确认</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    是否删除{{ cty.category }}？
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" data-dismiss="modal">取消</button>
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                                                onclick="del_category({{ cty.id }})">确认删除
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <br><br>
+
+{% endblock body1 %}
+
+
+{% block scripts %}
+    <script>
+        function del_category(number) {
+            $.ajax({
+                {#url: 'http://127.0.0.1:5000/blog/category_del',#}
+                url: '{{ url_for('blog.category_post', _external=True) }}',
+                headers: {'X-CSRFToken': '{{csrf_token()}}' },
+                data: JSON.stringify({"number": number, "op": "delete"}),
+                type: 'post',
+                contentType: 'application/json',
+                success: function (res) {
+                    if (res.success === false) {
+                        alert(res.msg);
+                    } else {
+                        location.reload()
+                    }
+                },
+                error: function (xhr, errorMessage, e) {
+                    alert(errorMessage);
+                }
+            });
+            return true
+        }
+    </script>
+{% endblock scripts %}

@@ -1,0 +1,40 @@
+{% extends 'user_base.html' %}
+{% block body %}
+    <img class="mb-4" src="../assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
+    <h1 class="h5 mb-3 font-weight-normal">Please Register Your Information</h1>
+    {#    <label for="inputEmail">邮箱</label>#}
+    {#    <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>#}
+    {#    <label for="inputUserName">用户名</label>#}
+    {#    <input type="text" id="inputUserName" class="form-control" placeholder="Name" required autofocus>#}
+    {#    <label for="inputPassword">密码</label>#}
+    {#    <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>#}
+    {#    <label for="inputConfirmPassword">重复密码</label>#}
+    {#    <input type="password" id="inputConfirmPassword" class="form-control" placeholder="ConfirmPassword" required>#}
+    {{ form_.csrf_token }}
+    {{ form_.email.label }}
+    {{ form_.email }}
+    {{ form_.password.label }}
+    {{ form_.password }}
+    {{ form_.confirm_password.label }}
+    {{ form_.confirm_password }}
+    {{ form_.username.label }}
+    {{ form_.username }}
+    {{ form_.age.label }}
+    {{ form_.age }}
+    {{ form_.gender.label }}
+    {{ form_.gender }}
+    {{ form_.op(value='register') }}
+
+    {% for msg in get_flashed_messages() %}
+        {{ msg }}
+    {% endfor %}
+    {{ form_.submit }}
+
+    {#    <button class="btn btn-lg btn-primary btn-block" type="submit">注册</button>#}
+{% endblock %}
+{% block slink %}
+    <a class="mt-5 mb-3" href="{{ url_for("admin.login") }}">
+        <button type="button" class="btn btn-outline-info">已有账号！点击登录
+        </button>
+    </a>
+{% endblock slink %}

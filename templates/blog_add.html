@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block link %}
+    <script src={{ url_for('static', filename='ckeditor/ckeditor.js') }}></script>
+
+{% endblock link %}
+
+{% block body1 %}
+    <div class="container">
+        {% for _flash in get_flashed_messages() %}
+            <div class="row">
+                <div class="col-9">
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+
+                        <strong>
+                            {{ _flash }}
+                        </strong>
+
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <form id="article_form" method="post" action="{{ url_for('blog.article_post') }}">
+            {{ form_.csrf_token }}
+            {{ form_.number }}
+            {{ form_.title.label }}
+            {{ form_.title }}
+            {{ form_.desc.label }}
+            {{ form_.desc }}
+            {{ form_.category.label }}
+            {{ form_.category }}
+            {{ form_.body.label }}
+            {{ form_.body }}
+            {{ form_.op }}
+            {{ ckeditor.config(name='body') }}
+            {{ form_.submit }}
+
+        </form>
+    </div>
+{% endblock body1 %}
