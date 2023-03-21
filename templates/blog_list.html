@@ -64,7 +64,7 @@
                         <ul class="list-group list-group-flush">
                             {% for category in categories %}
                                 <li class="list-group-item  list-group-item-action d-flex justify-content-between align-items-center">
-                                    <a href="{{ url_for('blog.read') }}">
+{#                                    <a href="{{ url_for('blog.read') }}">#}
                                         {{ category.category }}
                                     </a>
                                     <span class="badge badge-primary badge-pill"> {{ category.posts|length }}</span>

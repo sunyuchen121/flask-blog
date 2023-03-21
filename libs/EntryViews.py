@@ -39,10 +39,11 @@ class EntryView(views.MethodView):
         child_path = get_actual_child_path()
         # if self.__class__.NUMBER_MUST and not isinstance(number, numbers.Integral):
         #     flag = True
+
         process_view = getattr(self, f"{child_path}_process", None)
-        if not process_view and self.__class__.GET_DEFAULT_FUNC:
+        if not callable(process_view) and self.__class__.GET_DEFAULT_FUNC:
             process_view = getattr(self, self.__class__.GET_DEFAULT_FUNC, None)
-        if not process_view or not callable(process_view):
+        if not callable(process_view):
             abort(404)
         return process_view(*args, **kwargs)
 
