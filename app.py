@@ -9,7 +9,7 @@ import models
 
 
 def create_app(*args, **kwargs):
-    app = Flask("flask_blog", *args)
+    app = Flask("flask_blog", *args, **kwargs)
     app.config.from_object(CommonConf)
     register_exts(app)
     register_request_deal()
