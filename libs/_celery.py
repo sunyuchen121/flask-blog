@@ -1,7 +1,7 @@
 from celery import Celery
 
 
-def make_up_celery(name):
+def celery_factory(name):
     _c = Celery(name)
     _c.config_from_object("conf.CeleryConf")
     return _c

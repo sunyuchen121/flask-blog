@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_ckeditor import CKEditor
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
-from libs._celery import make_up_celery
+from libs._celery import celery_factory
 
 db = SQLAlchemy()
 # config sqlalchemy
@@ -22,8 +22,8 @@ csrf = CSRFProtect()
 
 
 # celery
-worker = make_up_celery("worker")
-beat = make_up_celery("worker")
-fast = make_up_celery("fast")
+worker = celery_factory("worker")
+beat = celery_factory("worker")
+fast = celery_factory("fast")
 
 print("*" * 10 + "extends.py ending" + "*" * 10)
