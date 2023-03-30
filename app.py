@@ -1,9 +1,8 @@
 from flask_migrate import Migrate
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify
 from extends import db, ckeditor, login_mgr, csrf
 from views import admin, blog, user
-from views.blog import old_function_api
-from settings import CommonConf
+from conf.settings import CommonConf
 from flask_wtf.csrf import CSRFError
 import models
 
@@ -45,7 +44,7 @@ def register_error(app):
 
 
 def register_request_deal():
-    import libs.RequestDeals
+    pass
 
 
 def register_api_class():
